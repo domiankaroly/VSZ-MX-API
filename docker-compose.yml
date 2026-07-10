@@ -1,0 +1,28 @@
+services:
+  vsz-web:
+    build: .
+    image: vsz-web:latest
+    container_name: vsz-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # ── NextAuth ──────────────────────────────────────────────────────────
+      NEXTAUTH_SECRET: "HnJbRvU0gdZxvVQs/vZ/xhEyWyuerNzIzqDl+7ZhAhY="
+      # NEXTAUTH_URL-t NE add meg — automatikusan detektálja a kérés URL-jét
+
+      # ── Adatbázis ─────────────────────────────────────────────────────────
+      DB_HOST: 192.168.10.9       # MySQL szerver IP-je (a Linux gépen lévő)
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: sys64738
+      DB_NAME: VSZ-NEW
+
+      # ── MQTT (opcionális) ─────────────────────────────────────────────────
+      MQTT_ENABLED: "false"
+      # MQTT_BROKER_URL: mqtt://192.168.1.100:1883
+
+      # ── Mx ERP integráció (opcionális) ───────────────────────────────────
+      MX_ERP_ENABLED: "true"
+      # MX_API_KEY: valami-api-kulcs
+      # MX_ERP_URL: https://erp.vargaszarnyas.hu/rest/...

@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  --vsz-blue: #1e40af;
+  --vsz-blue-light: #3b82f6;
+  --vsz-sidebar: #1e293b;
+  --vsz-sidebar-hover: #334155;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* Scrollbar stílus */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+/* Nyomtatás */
+@media print {
+  .no-print { display: none !important; }
+  .print-full { width: 100% !important; }
+}
