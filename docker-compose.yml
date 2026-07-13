@@ -1,8 +1,8 @@
 services:
   vsz-web:
     build: .
-    image: vsz-web:latest
-    container_name: vsz-web
+    image: vsz-mx-api:latest
+    container_name: vsz-mx-api
     restart: unless-stopped
     ports:
       - "3000:3000"
