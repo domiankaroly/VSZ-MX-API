@@ -1,6 +1,9 @@
 import { mxAuth } from '@/lib/mx-auth'
 import { execute, queryOne } from '@/lib/db'
 import { apiError } from '@/lib/utils'
+import { sendMail } from '@/lib/mail'
+
+const IT_ERTESITES_EMAIL = 'it@vargaszarnyas.hu'
 
 // ── Cikkszám (termék) import a Mx ERP irányából ────────────────────────────
 // POST /api/mx/cikkszam
@@ -162,6 +165,23 @@ export async function POST(request: Request) {
     }
 
     const hibaVan = eredmenyek.some(e => e.action === 'error')
+
+    // ── IT értesítő email — minden híváskor, a beérkezett cikkszám(ok)ról ──
+    try {
+      const azonositok = items.map(i => i.cikkszamAzonosito ?? '(hiányzó)')
+      await sendMail({
+        to: IT_ERTESITES_EMAIL,
+        subject: `Cikkszám import — ${azonositok.length} tétel`,
+        text:
+          `Mx ERP cikkszám import érkezett.\n\n` +
+          `Cikkszám azonosító(k):\n${azonositok.map(a => '- ' + a).join('\n')}\n\n` +
+          `Eredmény: ${eredmenyek.map(e => `${e.cikkszamAzonosito ?? '(hiányzó)'} → ${e.action}`).join(', ')}`,
+      })
+    } catch (mailErr) {
+      // Az email küldés hibája nem buktathatja el a tényleges importot
+      console.error('mx/cikkszam email értesítés hiba:', mailErr)
+    }
+
     return Response.json(
       { success: !hibaVan, feldolgozva: eredmenyek.length, eredmenyek },
       { status: hibaVan ? 207 : 200 }
