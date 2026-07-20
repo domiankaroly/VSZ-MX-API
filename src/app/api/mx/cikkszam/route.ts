@@ -2,8 +2,10 @@ import { mxAuth } from '@/lib/mx-auth'
 import { execute, queryOne } from '@/lib/db'
 import { apiError } from '@/lib/utils'
 import { sendMail } from '@/lib/mail'
+import { publishMqtt } from '@/lib/mqtt'
 
 const IT_ERTESITES_EMAIL = 'it@vargaszarnyas.hu'
+const MQTT_SYSTEM_TOPIC = 'vsz/system'
 
 // ── Cikkszám (termék) import a Mx ERP irányából ────────────────────────────
 // POST /api/mx/cikkszam
@@ -180,6 +182,15 @@ export async function POST(request: Request) {
     } catch (mailErr) {
       // Az email küldés hibája nem buktathatja el a tényleges importot
       console.error('mx/cikkszam email értesítés hiba:', mailErr)
+    }
+
+    // ── MQTT értesítés — NEWERPPLU;<cikkszamAzonosito> a vsz/system topicra ──
+    for (const item of items) {
+      try {
+        await publishMqtt(MQTT_SYSTEM_TOPIC, `NEWERPPLU;${item.cikkszamAzonosito ?? ''}`)
+      } catch (mqttErr) {
+        console.error('mx/cikkszam MQTT értesítés hiba:', mqttErr)
+      }
     }
 
     return Response.json(
